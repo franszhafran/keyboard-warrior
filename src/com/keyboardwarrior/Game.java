@@ -53,6 +53,7 @@ public class Game extends JPanel {
 		generatePattern();
 		System.out.println("Monster HP: " + Arena.getInstance().getMonster().getHp());
 		System.out.println(pattern);
+		playSoundAndPattern();
 	}
 
 	private void windowSet() {
@@ -82,9 +83,11 @@ public class Game extends JPanel {
 		Arena.getInstance().getPlayer().getDamage().setDamage(level);
 		Arena.getInstance().getMonster().setHp(500);
 		pattern.clear();
+		resetInput();
 		generatePattern();
 		System.out.println("You Lose ;(");
 		System.out.println(pattern);
+		playSoundAndPattern();
 	}
 
 	public void resetInput() {
@@ -92,7 +95,21 @@ public class Game extends JPanel {
 	}
 
 	public void playSoundAndPattern() {
-
+		for(int i=0;i<pattern.size();i++) {
+			int e = pattern.get(i);
+			
+			if(e == 0) {
+				System.out.println("s");
+			} else if(e == 1) {
+				System.out.println("d");
+			} else if(e == 2) {
+				System.out.println("f");
+			} else if(e == 3) {
+				System.out.println("j");
+			} else if(e == 4) {
+				System.out.println("k");
+			}
+		}
 	}
 
 	/**
@@ -104,36 +121,21 @@ public class Game extends JPanel {
 			input = getKeyIndex(inputKey);
 			inputArr.add(input);
 		} catch (Exception e) {
-			System.out.println(e);
 			return;
 		}
 
-		if (pattern.size() == 1) {
-			if (input == pattern.get(inputArr.size() - 1)) {
-				System.out.println("✅");
-				resetInput();
-				upLevel();
-			} else {
-				System.out.println("ⓧ");
-				resetInput();
-				reset();
-			}
+		if(inputArr.get(inputArr.size() - 1) == pattern.get(inputArr.size() - 1)) {
+			System.out.println("Ok");
 		} else {
-
-			if (inputArr.size() != pattern.size()) {
-//			check if input is the same as the pattern
-				if (input == pattern.get(inputArr.size() - 1))
-					System.out.println("✅");
-				else {
-					System.out.println("ⓧ");
-					resetInput();
-					reset();
-				}
-			} else {
-				resetInput();
-				upLevel();
-			}
+			reset();
 		}
+		
+		if(inputArr.size() == pattern.size()) {
+			upLevel();
+			playSoundAndPattern();
+			resetInput();
+		}
+		
 		repaint();
 	}
 
