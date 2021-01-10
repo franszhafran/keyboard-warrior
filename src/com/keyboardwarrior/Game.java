@@ -23,6 +23,7 @@ public class Game extends JPanel {
 	private ArrayList<Integer> inputArr;
 	private ArrayList<Key> keys;
 	private SoundPlayer error;
+	private ProgressBar monsterHp;
 	private int input;
 	private char inputKey;
 	private boolean isPlayingSoundAndPattern = false;
@@ -63,13 +64,15 @@ public class Game extends JPanel {
 
 	private void initGame() {
 		ArenaFactoryConfigBuilder arenaConfigB = new ArenaFactoryConfigBuilder();
-		arenaConfigB.setMonsterHP(500);
+		arenaConfigB.setMonsterHP(100);
 		arenaConfigB.setPlayerDamage(50);
 
 		ArenaFactory.createFromConfig(arenaConfigB.build());
 		level = 1;
 
 		generatePattern();
+		monsterHp = new ProgressBar(Arena.getInstance().getMonster().getHp(), Arena.getInstance().getMonster().getHp(),
+				0, 70, 100, 20);
 		System.out.println("Monster HP: " + Arena.getInstance().getMonster().getHp());
 		System.out.println(pattern);
 	}
@@ -89,6 +92,7 @@ public class Game extends JPanel {
 		for (Key key : keys) {
 			key.render(g);
 		}
+		monsterHp.render(g);
 	}
 
 	public void upLevel() {
@@ -96,6 +100,7 @@ public class Game extends JPanel {
 		this.level++;
 		generatePattern();
 		Arena.getInstance().playerAttack();
+		monsterHp.setValue(Arena.getInstance().getMonster().getHp());
 		System.out.println("Monster HP: " + Arena.getInstance().getMonster().getHp());
 		System.out.println(pattern);
 	}
