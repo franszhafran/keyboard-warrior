@@ -2,9 +2,7 @@ package com.keyboardwarrior;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -17,7 +15,7 @@ import javax.swing.Timer;
 
 import com.creational.ArenaFactory;
 import com.creational.ArenaFactoryConfigBuilder;
-import java.util.concurrent.TimeUnit;
+
 public class Game extends JPanel {
 	private int level;
 	private Arena arena;
@@ -35,16 +33,16 @@ public class Game extends JPanel {
 		initKeys();
 		initArrays();
 		initGame();
-		
+
 		windowSet();
-		
+
 		KeyListener l = new GameKeyboardListener();
 		this.addKeyListener(l);
 
 		this.setFocusable(true);
 
 		inputKey = 'a';
-		
+
 		playSoundAndPattern();
 	}
 
@@ -52,14 +50,14 @@ public class Game extends JPanel {
 		pattern = new ArrayList<Integer>();
 		inputArr = new ArrayList<Integer>();
 	}
-	
+
 	private void initKeys() {
 		this.keys = new ArrayList<Key>();
-		this.keys.add(new Key(0, 0, "s", false));
-		this.keys.add(new Key(60, 0, "d", false));
-		this.keys.add(new Key(120, 0, "f", false));
-		this.keys.add(new Key(180, 0, "j", false));
-		this.keys.add(new Key(240, 0, "k", false));
+		this.keys.add(new Key(0, 0, "s"));
+		this.keys.add(new Key(60, 0, "d"));
+		this.keys.add(new Key(120, 0, "f"));
+		this.keys.add(new Key(180, 0, "j"));
+		this.keys.add(new Key(240, 0, "k"));
 	}
 
 	private void initGame() {
@@ -86,8 +84,8 @@ public class Game extends JPanel {
 		super.paintComponent(g);
 		g.setColor(Color.BLACK);
 		g.drawString(String.valueOf(inputKey), 25, 25);
-		
-		for(Key key : keys) {
+
+		for (Key key : keys) {
 			key.render(g);
 		}
 	}
@@ -110,46 +108,72 @@ public class Game extends JPanel {
 		generatePattern();
 		System.out.println("You Lose ;(");
 		System.out.println(pattern);
-		playSoundAndPattern();
+		playError();
+		ActionListener togglePlayPattern = new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				playSoundAndPattern();
+				repaint();
+			}
+		};
+		Timer timer = new Timer((1500), togglePlayPattern);
+		timer.setRepeats(false);
+		timer.start();
 	}
 
 	public void resetInput() {
 		inputArr.clear();
 	}
 
+	public void playError() {
+		for (final Key key : keys) {
+			key.setState(Key.ERROR);
+
+			ActionListener toggleOff = new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					key.setState(Key.RELEASED);
+					repaint();
+				}
+			};
+
+			Timer timer = new Timer((1000), toggleOff);
+			timer.setRepeats(false);
+			timer.start();
+		}
+	}
+
 	public void playSoundAndPattern() {
 		isPlayingSoundAndPattern = true;
-		for(int i=0;i<pattern.size();i++) {
+		for (int i = 0; i < pattern.size(); i++) {
 			final int e = pattern.get(i);
-			
+
 			ActionListener toggleOn = new ActionListener() {
-	            public void actionPerformed(ActionEvent evt) {
-	            	keys.get(e).setPressed(true);
-	                repaint();
-	            }
-	        };
-	        Timer timer = new Timer(1500*(i), toggleOn);
-	        timer.setRepeats(false);
-	        timer.start();
-	        
-	        ActionListener toggleOff = new ActionListener() {
-	            public void actionPerformed(ActionEvent evt) {
-	                keys.get(e).setPressed(false);
-	                repaint();
-	            }
-	        };
-	        Timer timer2 = new Timer((1500*(i)+1000), toggleOff);
-	        timer2.setRepeats(false);
-	        timer2.start();
+				public void actionPerformed(ActionEvent evt) {
+					keys.get(e).setState(Key.PRESSED);
+					repaint();
+				}
+			};
+			Timer timer = new Timer(1000 * (i) + 500, toggleOn);
+			timer.setRepeats(false);
+			timer.start();
+
+			ActionListener toggleOff = new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					keys.get(e).setState(Key.RELEASED);
+					repaint();
+				}
+			};
+			Timer timer2 = new Timer((1000 * (i) + 1000), toggleOff);
+			timer2.setRepeats(false);
+			timer2.start();
 		}
 		ActionListener toggleOff = new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                isPlayingSoundAndPattern = false;
-            }
-        };
-        Timer timer2 = new Timer((1500*(pattern.size() - 1)+1000),toggleOff);
-        timer2.setRepeats(false);
-        timer2.start();
+			public void actionPerformed(ActionEvent evt) {
+				isPlayingSoundAndPattern = false;
+			}
+		};
+		Timer timer2 = new Timer((1000 * (pattern.size() - 1) + 1000), toggleOff);
+		timer2.setRepeats(false);
+		timer2.start();
 	}
 
 	/**
@@ -164,26 +188,26 @@ public class Game extends JPanel {
 			return;
 		}
 
-		if(inputArr.get(inputArr.size() - 1) == pattern.get(inputArr.size() - 1)) {
+		if (inputArr.get(inputArr.size() - 1) == pattern.get(inputArr.size() - 1)) {
 			System.out.println("Ok");
 		} else {
 			reset();
 			System.out.println("WRONG!");
 		}
-		
-		if(inputArr.size() == pattern.size()) {			
+
+		if (inputArr.size() == pattern.size()) {
 			upLevel();
 			ActionListener toggleOn = new ActionListener() {
-	            public void actionPerformed(ActionEvent evt) {
-	            	playSoundAndPattern();
-	            }
-	        };
-	        Timer timer = new Timer(1000, toggleOn);
-	        timer.setRepeats(false);
-	        timer.start();
+				public void actionPerformed(ActionEvent evt) {
+					playSoundAndPattern();
+				}
+			};
+			Timer timer = new Timer(1000, toggleOn);
+			timer.setRepeats(false);
+			timer.start();
 			resetInput();
 		}
-		
+
 		repaint();
 	}
 
@@ -236,10 +260,10 @@ public class Game extends JPanel {
 	private class GameKeyboardListener implements KeyListener {
 		@Override
 		public void keyTyped(KeyEvent e) {
-			if(!isPlayingSoundAndPattern) {
+			if (!isPlayingSoundAndPattern) {
 				inputKey = e.getKeyChar();
 				readAndCheckInput();
-				if(String.valueOf(inputKey).equals("p")) {
+				if (String.valueOf(inputKey).equals("p")) {
 					playSoundAndPattern();
 				}
 			}
@@ -247,31 +271,34 @@ public class Game extends JPanel {
 
 		@Override
 		public void keyPressed(KeyEvent e) {
-			if(isPlayingSoundAndPattern) {
+			if (isPlayingSoundAndPattern) {
 				return;
 			}
-			
-			for(Key key : keys) {
-				if(key.getCharacter().equals(String.valueOf(e.getKeyChar()))) {
-					key.setPressed(true);
+
+			for (Key key : keys) {
+				if (key.getCharacter().equals(String.valueOf(e.getKeyChar()))) {
+					key.setState(key.PRESSED);
 				}
 			}
-			
+
 			repaint();
 		}
 
 		@Override
 		public void keyReleased(KeyEvent e) {
-			if(isPlayingSoundAndPattern) {
+			if (isPlayingSoundAndPattern) {
 				return;
 			}
-			
-			for(Key key : keys) {
-				if(key.getCharacter().equals(String.valueOf(e.getKeyChar()))) {
-					key.setPressed(false);
+
+			for (Key key : keys) {
+//				if error sign is currently on
+				if (key.getState() != key.ERROR) {
+					if (key.getCharacter().equals(String.valueOf(e.getKeyChar()))) {
+						key.setState(key.RELEASED);
+					}
 				}
 			}
-			
+
 			repaint();
 		}
 	}
