@@ -22,6 +22,7 @@ public class Game extends JPanel {
 	private ArrayList<Integer> pattern;
 	private ArrayList<Integer> inputArr;
 	private ArrayList<Key> keys;
+	private SoundPlayer error;
 	private int input;
 	private char inputKey;
 	private boolean isPlayingSoundAndPattern = false;
@@ -125,12 +126,15 @@ public class Game extends JPanel {
 	}
 
 	public void playError() {
+		error = new SoundPlayer("/Sound/error.wav");
+		error.play();
 		for (final Key key : keys) {
 			key.setState(Key.ERROR);
 
 			ActionListener toggleOff = new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
 					key.setState(Key.RELEASED);
+
 					repaint();
 				}
 			};
@@ -139,20 +143,24 @@ public class Game extends JPanel {
 			timer.setRepeats(false);
 			timer.start();
 		}
+
 	}
 
 	public void playSoundAndPattern() {
 		isPlayingSoundAndPattern = true;
+		int time = 500 - pattern.size() * 20;
 		for (int i = 0; i < pattern.size(); i++) {
 			final int e = pattern.get(i);
 
 			ActionListener toggleOn = new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
 					keys.get(e).setState(Key.PRESSED);
+					keys.get(e).play();
 					repaint();
 				}
 			};
-			Timer timer = new Timer(1000 * (i) + 500, toggleOn);
+			Timer timer = new Timer(time * (2 * i + 1), toggleOn);
+//			System.out.println(time * (2 * i + 1));
 			timer.setRepeats(false);
 			timer.start();
 
@@ -162,16 +170,20 @@ public class Game extends JPanel {
 					repaint();
 				}
 			};
-			Timer timer2 = new Timer((1000 * (i) + 1000), toggleOff);
+			Timer timer2 = new Timer(time * (2 * i + 2), toggleOff);
+//			System.out.println(time * (2 * i + 2));
+//			System.out.println();
 			timer2.setRepeats(false);
 			timer2.start();
 		}
 		ActionListener toggleOff = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				isPlayingSoundAndPattern = false;
+
 			}
 		};
-		Timer timer2 = new Timer((1000 * (pattern.size() - 1) + 1000), toggleOff);
+		Timer timer2 = new Timer(time * ((pattern.size() + 1) * 2 - 1), toggleOff);
+//		System.out.println(time * ((pattern.size()) * 2 - 1));
 		timer2.setRepeats(false);
 		timer2.start();
 	}
@@ -189,6 +201,7 @@ public class Game extends JPanel {
 		}
 
 		if (inputArr.get(inputArr.size() - 1) == pattern.get(inputArr.size() - 1)) {
+			keys.get(input).play();
 			System.out.println("Ok");
 		} else {
 			reset();
@@ -278,6 +291,7 @@ public class Game extends JPanel {
 			for (Key key : keys) {
 				if (key.getCharacter().equals(String.valueOf(e.getKeyChar()))) {
 					key.setState(key.PRESSED);
+//					key.play();
 				}
 			}
 

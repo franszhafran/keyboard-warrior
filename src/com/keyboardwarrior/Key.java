@@ -9,14 +9,16 @@ public class Key {
 	public static final int PRESSED = 2;
 	public static final int ERROR = 3;
 	private int x, y, state;
-
-	private String character;
+	private String url, character;
+	private SoundPlayer sound;
 
 	public Key(int x, int y, String character) {
 		this.character = character;
 		this.state = RELEASED;
+		this.url = "/Sound/" + character + "key.wav";
 		this.x = x;
 		this.y = y;
+//		sound = new SoundPlayer(url);
 	}
 
 	public void render(Graphics g) {
@@ -53,5 +55,10 @@ public class Key {
 
 	public void setState(int state) {
 		this.state = state;
+	}
+
+	public void play() {
+		sound = new SoundPlayer(url);
+		sound.play();
 	}
 }
