@@ -63,14 +63,17 @@ public class Game extends JPanel {
 		this.keys.add(new Key(120, 0, "f"));
 		this.keys.add(new Key(180, 0, "j"));
 		this.keys.add(new Key(240, 0, "k"));
+		for(int i=0;i<keys.size();i++) {
+			System.out.println(keys.get(i).getCharacter());
+		}
 	}
 
 	private void initGame() {
-		ArenaFactoryConfigBuilder arenaConfigB = new ArenaFactoryConfigBuilder();
-		arenaConfigB.setMonsterHP(5);
-		arenaConfigB.setPlayerDamage(50);
+		ArenaFactoryConfigBuilder arenaConfig = new ArenaFactoryConfigBuilder();
+		arenaConfig.setMonsterHP(15);
+		arenaConfig.setPlayerDamage(1);
 
-		ArenaFactory.createFromConfig(arenaConfigB.build());
+		ArenaFactory.createFromConfig(arenaConfig.build());
 		level = 1;
 
 		generatePattern();
@@ -89,7 +92,10 @@ public class Game extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		
+		
 		g.setColor(Color.BLACK);
+		
 		g.drawString(String.valueOf(inputKey), 325, 325);
 		g.drawString("Monster HP: " + Arena.getInstance().getMonster().getHp(), 200, 200);
 		g.drawString("Level: " + gameLevel, 200, 180);
@@ -105,24 +111,40 @@ public class Game extends JPanel {
 		this.level++;
 		generatePattern();
 		Arena.getInstance().playerAttack();
-		monsterHp.setValue(Arena.getInstance().getMonster().getHp());
+		drawMonsterHp();
 		System.out.println("Monster HP: " + Arena.getInstance().getMonster().getHp());
 
 		if (Arena.getInstance().getMonster().getHp() <= 0) {
-			ActionListener toggleDialog = new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					JOptionPane.showOptionDialog(null, "Congratulations, You Won!", "Congratulations",
-							JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
-							new String[] { "Next Level" }, "default");
-					gameLevel++;
-					isWinning = true;
-					reset();
-				}
-			};
-			Timer timer = new Timer(1000, toggleDialog);
-			timer.setRepeats(false);
-			timer.start();
-
+//			ActionListener toggleDialog = new ActionListener() {
+//				public void actionPerformed(ActionEvent evt) {
+//					int x = 5;
+//					x = JOptionPane.showOptionDialog(null, "Congratulations, You Won!", "Congratulations",
+//							JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+//							new String[] { "Next Level" }, "default");
+//					System.out.println("dialog callback");
+//					System.out.println(x);
+//					if(x == 0) {
+//						System.out.println("X is");
+//						System.out.println(x);
+//						gameLevel++;
+//						isWinning = true;
+//						reset();
+//					}
+//				}
+//			};
+//			Timer timer = new Timer(1000, toggleDialog);
+//			timer.setRepeats(false);
+//			timer.start();
+			int x = -1;
+			x = JOptionPane.showOptionDialog(null, "Congratulations, You Won!", "Congratulations",
+					JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+					new String[] { "Next Level" }, "default");
+			
+			if(x == 0) {
+				gameLevel++;
+				isWinning = true;
+				reset();
+			}
 		}
 
 		System.out.println(pattern);
@@ -137,11 +159,23 @@ public class Game extends JPanel {
 			Arena.getInstance().getMonster().setHp(200);
 		}
 	}
+	
+	private void drawMonsterHp() {
+		if(Arena.getInstance().getMonster().getHp() > monsterHp.getMaxValue()) {
+			monsterHp.setMaxValue(Arena.getInstance().getMonster().getHp());
+			monsterHp.setValue(Arena.getInstance().getMonster().getHp());
+		} else {
+			monsterHp.setValue(Arena.getInstance().getMonster().getHp());
+		}
+	}
 
 	public void reset() {
 		level = 1;
+		keys.get(pattern.get(pattern.size()- 1)).setState(Key.RELEASED);
 		Arena.getInstance().getPlayer().getDamage().setDamage(level);
+		repaint();
 		setMonsterHp();
+		drawMonsterHp();
 		pattern.clear();
 		resetInput();
 		generatePattern();
@@ -150,6 +184,7 @@ public class Game extends JPanel {
 
 		// reset iswinning to it state
 		isWinning = false;
+		
 		ActionListener togglePlayPattern = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				playSoundAndPattern();
