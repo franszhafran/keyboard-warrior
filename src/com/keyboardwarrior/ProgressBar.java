@@ -6,7 +6,7 @@ import java.awt.Graphics;
 public class ProgressBar {
 	private int maxValue, value, x, y, height, width;
 	private Color baseColor, foreColor;
-	
+
 	public ProgressBar(int maxValue, int value, int x, int y, int width, int height) {
 		this.maxValue = maxValue;
 		this.value = value;
@@ -17,20 +17,20 @@ public class ProgressBar {
 		baseColor = Color.GRAY;
 		foreColor = Color.BLUE;
 	}
-	
+
 	private double getUnit() {
 		return (double) width / maxValue;
 	}
-	
+
 	public void render(Graphics g) {
 		g.setColor(baseColor);
 		g.fillRect(this.x, this.y, width, height);
-		
-		System.out.println(getUnit());
-		System.out.println(value);
-		System.out.println((int) getUnit()*value);
+
+//		System.out.println(getUnit());
+//		System.out.println(value);
+//		System.out.println((int) getUnit()*value);
 		g.setColor(foreColor);
-		g.fillRect(this.x, this.y, (int) (getUnit()*value), height);
+		g.fillRect(this.x, this.y, (int) (getUnit() * value), height);
 
 	}
 
@@ -49,7 +49,7 @@ public class ProgressBar {
 	public void setValue(int value) {
 		this.value = value;
 	}
-	
+
 	public void addValue(int value) {
 		this.value = this.value + value;
 	}
@@ -101,6 +101,5 @@ public class ProgressBar {
 	public void setForeColor(Color foreColor) {
 		this.foreColor = foreColor;
 	}
-	
-	
+
 }

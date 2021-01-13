@@ -10,6 +10,7 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -18,6 +19,7 @@ import com.creational.ArenaFactoryConfigBuilder;
 
 public class Game extends JPanel {
 	private int level;
+	private int gameLevel = 1;
 	private Arena arena;
 	private ArrayList<Integer> pattern;
 	private ArrayList<Integer> inputArr;
@@ -27,6 +29,7 @@ public class Game extends JPanel {
 	private int input;
 	private char inputKey;
 	private boolean isPlayingSoundAndPattern = false;
+	private boolean isWinning = false;
 
 	/**
 	 * Set up the game
@@ -64,7 +67,7 @@ public class Game extends JPanel {
 
 	private void initGame() {
 		ArenaFactoryConfigBuilder arenaConfigB = new ArenaFactoryConfigBuilder();
-		arenaConfigB.setMonsterHP(100);
+		arenaConfigB.setMonsterHP(5);
 		arenaConfigB.setPlayerDamage(50);
 
 		ArenaFactory.createFromConfig(arenaConfigB.build());
@@ -87,7 +90,9 @@ public class Game extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.setColor(Color.BLACK);
-		g.drawString(String.valueOf(inputKey), 25, 25);
+		g.drawString(String.valueOf(inputKey), 325, 325);
+		g.drawString("Monster HP: " + Arena.getInstance().getMonster().getHp(), 200, 200);
+		g.drawString("Level: " + gameLevel, 200, 180);
 
 		for (Key key : keys) {
 			key.render(g);
@@ -102,19 +107,49 @@ public class Game extends JPanel {
 		Arena.getInstance().playerAttack();
 		monsterHp.setValue(Arena.getInstance().getMonster().getHp());
 		System.out.println("Monster HP: " + Arena.getInstance().getMonster().getHp());
+
+		if (Arena.getInstance().getMonster().getHp() <= 0) {
+			ActionListener toggleDialog = new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					JOptionPane.showOptionDialog(null, "Congratulations, You Won!", "Congratulations",
+							JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+							new String[] { "Next Level" }, "default");
+					gameLevel++;
+					isWinning = true;
+					reset();
+				}
+			};
+			Timer timer = new Timer(1000, toggleDialog);
+			timer.setRepeats(false);
+			timer.start();
+
+		}
+
 		System.out.println(pattern);
+	}
+
+	public void setMonsterHp() {
+		if (gameLevel == 1) {
+			Arena.getInstance().getMonster().setHp(5);
+		} else if (gameLevel == 2) {
+			Arena.getInstance().getMonster().setHp(5);
+		} else if (gameLevel == 3) {
+			Arena.getInstance().getMonster().setHp(200);
+		}
 	}
 
 	public void reset() {
 		level = 1;
 		Arena.getInstance().getPlayer().getDamage().setDamage(level);
-		Arena.getInstance().getMonster().setHp(500);
+		setMonsterHp();
 		pattern.clear();
 		resetInput();
 		generatePattern();
-		System.out.println("You Lose ;(");
-		System.out.println(pattern);
-		playError();
+		if (!isWinning)
+			playError();
+
+		// reset iswinning to it state
+		isWinning = false;
 		ActionListener togglePlayPattern = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				playSoundAndPattern();
@@ -133,6 +168,7 @@ public class Game extends JPanel {
 	public void playError() {
 		error = new SoundPlayer("/Sound/error.wav");
 		error.play();
+
 		for (final Key key : keys) {
 			key.setState(Key.ERROR);
 
