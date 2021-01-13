@@ -12,6 +12,7 @@ public class Main {
 			 frame.setContentPane(new Game());
 			 frame.pack();
 			 frame.setVisible(true);
+			 frame.setResizable(false);
 			 }
 		});
 	}
