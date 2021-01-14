@@ -63,7 +63,7 @@ public class Game extends JPanel {
 		this.keys.add(new Key(120, 0, "f"));
 		this.keys.add(new Key(180, 0, "j"));
 		this.keys.add(new Key(240, 0, "k"));
-		for(int i=0;i<keys.size();i++) {
+		for (int i = 0; i < keys.size(); i++) {
 			System.out.println(keys.get(i).getCharacter());
 		}
 	}
@@ -92,10 +92,9 @@ public class Game extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		
-		
+
 		g.setColor(Color.BLACK);
-		
+
 		g.drawString(String.valueOf(inputKey), 325, 325);
 		g.drawString("Monster HP: " + Arena.getInstance().getMonster().getHp(), 200, 200);
 		g.drawString("Level: " + gameLevel, 200, 180);
@@ -147,11 +146,21 @@ public class Game extends JPanel {
 //			timer.start();
 			int x = -1;
 			x = JOptionPane.showOptionDialog(null, "Congratulations, You Won!", "Congratulations",
+<<<<<<< HEAD
 					JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
 					new String[] { "Next Level" }, "default");
 			
 			if(x == 0) {
 				upGameLevel();
+=======
+					JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new String[] { "Next Level" },
+					"default");
+
+			if (x == 0) {
+				gameLevel++;
+				isWinning = true;
+				reset();
+>>>>>>> 9f76ed828cff4a2af67547c079c8da2e9222909b
 			}
 		}
 
@@ -167,17 +176,26 @@ public class Game extends JPanel {
 			Arena.getInstance().getMonster().setHp(200);
 		}
 	}
-	
+
 	private void drawMonsterHp() {
-		if(Arena.getInstance().getMonster().getHp() > monsterHp.getMaxValue()) {
+		if (Arena.getInstance().getMonster().getHp() > monsterHp.getMaxValue()) {
 			monsterHp.setMaxValue(Arena.getInstance().getMonster().getHp());
 			monsterHp.setValue(Arena.getInstance().getMonster().getHp());
 		} else {
 			monsterHp.setValue(Arena.getInstance().getMonster().getHp());
 		}
 	}
+<<<<<<< HEAD
 	
 	private void setAndDrawMonsterHpBasedOnLevel() {
+=======
+
+	public void reset() {
+		level = 1;
+		keys.get(pattern.get(pattern.size() - 1)).setState(Key.RELEASED);
+		Arena.getInstance().getPlayer().getDamage().setDamage(level);
+		repaint();
+>>>>>>> 9f76ed828cff4a2af67547c079c8da2e9222909b
 		setMonsterHp();
 		drawMonsterHp();
 	}
@@ -197,9 +215,19 @@ public class Game extends JPanel {
 		resetInput();
 		
 		generatePattern();
+<<<<<<< HEAD
 		
+=======
+		if (!isWinning)
+			playError();
+
+		// reset iswinning to it state
+		isWinning = false;
+
+>>>>>>> 9f76ed828cff4a2af67547c079c8da2e9222909b
 		ActionListener togglePlayPattern = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
+				playInitialSound();
 				playSoundAndPattern();
 				repaint();
 			}
@@ -235,6 +263,26 @@ public class Game extends JPanel {
 			};
 
 			Timer timer = new Timer((1000), toggleOff);
+			timer.setRepeats(false);
+			timer.start();
+		}
+
+	}
+
+	public void playInitialSound() {
+
+		for (final Key key : keys) {
+			key.setState(Key.PRESSED);
+
+			ActionListener toggleOff = new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					key.setState(Key.RELEASED);
+
+					repaint();
+				}
+			};
+
+			Timer timer = new Timer((100), toggleOff);
 			timer.setRepeats(false);
 			timer.start();
 		}
@@ -303,6 +351,7 @@ public class Game extends JPanel {
 			System.out.println("WRONG!");
 		}
 
+		// if pattern successfully played
 		if (inputArr.size() == pattern.size()) {
 			upPatternLevel();
 			ActionListener toggleOn = new ActionListener() {
@@ -310,9 +359,13 @@ public class Game extends JPanel {
 					playSoundAndPattern();
 				}
 			};
+
 			Timer timer = new Timer(1000, toggleOn);
 			timer.setRepeats(false);
-			timer.start();
+			if (monsterHp.getValue() != monsterHp.getMaxValue()) {
+				System.out.println("ini jalan");
+				timer.start();
+			}
 			resetInput();
 		}
 
@@ -371,9 +424,6 @@ public class Game extends JPanel {
 			if (!isPlayingSoundAndPattern) {
 				inputKey = e.getKeyChar();
 				readAndCheckInput();
-				if (String.valueOf(inputKey).equals("p")) {
-					playSoundAndPattern();
-				}
 			}
 		}
 
