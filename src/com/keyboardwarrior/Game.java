@@ -18,7 +18,7 @@ import com.creational.ArenaFactory;
 import com.creational.ArenaFactoryConfigBuilder;
 
 public class Game extends JPanel {
-	private int level;
+	private int patternLevel;
 	private int gameLevel = 1;
 	private Arena arena;
 	private ArrayList<Integer> pattern;
@@ -74,7 +74,7 @@ public class Game extends JPanel {
 		arenaConfig.setPlayerDamage(1);
 
 		ArenaFactory.createFromConfig(arenaConfig.build());
-		level = 1;
+		patternLevel = 1;
 
 		generatePattern();
 		monsterHp = new ProgressBar(Arena.getInstance().getMonster().getHp(), Arena.getInstance().getMonster().getHp(),
@@ -106,12 +106,22 @@ public class Game extends JPanel {
 		monsterHp.render(g);
 	}
 
-	public void upLevel() {
-		Arena.getInstance().getPlayer().getDamage().setDamage(level);
-		this.level++;
-		generatePattern();
+	private void setPlayerDamageBasedOnLevel() {
+		Arena.getInstance().getPlayer().getDamage().setDamage(patternLevel);
+	}
+	
+	private void gamePlayerAttackAndDrawHp() {
 		Arena.getInstance().playerAttack();
 		drawMonsterHp();
+	}
+	
+	public void upPatternLevel() {
+		this.patternLevel++;
+		
+		setPlayerDamageBasedOnLevel();
+		generatePattern();
+		gamePlayerAttackAndDrawHp();
+		
 		System.out.println("Monster HP: " + Arena.getInstance().getMonster().getHp());
 
 		if (Arena.getInstance().getMonster().getHp() <= 0) {
@@ -141,9 +151,7 @@ public class Game extends JPanel {
 					new String[] { "Next Level" }, "default");
 			
 			if(x == 0) {
-				gameLevel++;
-				isWinning = true;
-				reset();
+				upGameLevel();
 			}
 		}
 
@@ -168,22 +176,27 @@ public class Game extends JPanel {
 			monsterHp.setValue(Arena.getInstance().getMonster().getHp());
 		}
 	}
-
-	public void reset() {
-		level = 1;
-		keys.get(pattern.get(pattern.size()- 1)).setState(Key.RELEASED);
-		Arena.getInstance().getPlayer().getDamage().setDamage(level);
-		repaint();
+	
+	private void setAndDrawMonsterHpBasedOnLevel() {
 		setMonsterHp();
 		drawMonsterHp();
-		pattern.clear();
-		resetInput();
-		generatePattern();
-		if (!isWinning)
-			playError();
+	}
+	
+	public void upGameLevel() {
+		gameLevel++;
+		resetPatternAndPlayPattern();
+		playError();
+	}
 
-		// reset iswinning to it state
-		isWinning = false;
+	public void resetPatternAndPlayPattern() {
+		patternLevel = 1;
+		pattern.clear();
+		
+		setPlayerDamageBasedOnLevel();
+		setAndDrawMonsterHpBasedOnLevel();
+		resetInput();
+		
+		generatePattern();
 		
 		ActionListener togglePlayPattern = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -191,9 +204,15 @@ public class Game extends JPanel {
 				repaint();
 			}
 		};
+		
 		Timer timer = new Timer((1500), togglePlayPattern);
 		timer.setRepeats(false);
 		timer.start();
+	}
+	
+	private void clearAndDrawLastInput() {
+		keys.get(pattern.get(pattern.size()- 1)).setState(Key.RELEASED);
+		repaint();
 	}
 
 	public void resetInput() {
@@ -280,12 +299,12 @@ public class Game extends JPanel {
 			keys.get(input).play();
 			System.out.println("Ok");
 		} else {
-			reset();
+			resetPatternAndPlayPattern();
 			System.out.println("WRONG!");
 		}
 
 		if (inputArr.size() == pattern.size()) {
-			upLevel();
+			upPatternLevel();
 			ActionListener toggleOn = new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
 					playSoundAndPattern();
