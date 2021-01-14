@@ -105,7 +105,7 @@ public class Game extends JPanel {
 		monsterHp.render(g);
 	}
 
-	private void setPlayerDamageBasedOnLevel() {
+	private void setPlayerDamageBasedOnPatternLevel() {
 		Arena.getInstance().getPlayer().getDamage().setDamage(patternLevel);
 	}
 	
@@ -117,7 +117,7 @@ public class Game extends JPanel {
 	public void upPatternLevel() {
 		this.patternLevel++;
 		
-		setPlayerDamageBasedOnLevel();
+		setPlayerDamageBasedOnPatternLevel();
 		generatePattern();
 		gamePlayerAttackAndDrawHp();
 		
@@ -146,32 +146,22 @@ public class Game extends JPanel {
 //			timer.start();
 			int x = -1;
 			x = JOptionPane.showOptionDialog(null, "Congratulations, You Won!", "Congratulations",
-<<<<<<< HEAD
 					JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
 					new String[] { "Next Level" }, "default");
 			
 			if(x == 0) {
 				upGameLevel();
-=======
-					JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new String[] { "Next Level" },
-					"default");
-
-			if (x == 0) {
-				gameLevel++;
-				isWinning = true;
-				reset();
->>>>>>> 9f76ed828cff4a2af67547c079c8da2e9222909b
 			}
 		}
 
 		System.out.println(pattern);
 	}
 
-	public void setMonsterHp() {
+	public void setMonsterHp(int gameLevel) {
 		if (gameLevel == 1) {
-			Arena.getInstance().getMonster().setHp(5);
+			Arena.getInstance().getMonster().setHp(15);
 		} else if (gameLevel == 2) {
-			Arena.getInstance().getMonster().setHp(5);
+			Arena.getInstance().getMonster().setHp(55);
 		} else if (gameLevel == 3) {
 			Arena.getInstance().getMonster().setHp(200);
 		}
@@ -185,46 +175,38 @@ public class Game extends JPanel {
 			monsterHp.setValue(Arena.getInstance().getMonster().getHp());
 		}
 	}
-<<<<<<< HEAD
 	
-	private void setAndDrawMonsterHpBasedOnLevel() {
-=======
-
-	public void reset() {
-		level = 1;
-		keys.get(pattern.get(pattern.size() - 1)).setState(Key.RELEASED);
-		Arena.getInstance().getPlayer().getDamage().setDamage(level);
-		repaint();
->>>>>>> 9f76ed828cff4a2af67547c079c8da2e9222909b
-		setMonsterHp();
+	private void setAndDrawMonsterHpBasedOnGameLevel() {
+		setAndDrawMonsterHp(gameLevel);
+	}
+	
+	private void setAndDrawMonsterHp(int gameLevel) {
+		setMonsterHp(gameLevel);
 		drawMonsterHp();
 	}
 	
+	
+	
 	public void upGameLevel() {
 		gameLevel++;
-		resetPatternAndPlayPattern();
+		resetPatternAndPlayNewPattern();
 		playError();
 	}
 
-	public void resetPatternAndPlayPattern() {
+	public void resetPatternAndPlayNewPattern() {
+		// reset pattern
 		patternLevel = 1;
 		pattern.clear();
 		
-		setPlayerDamageBasedOnLevel();
-		setAndDrawMonsterHpBasedOnLevel();
+		// prepare new game with new pattern level
+		setPlayerDamageBasedOnPatternLevel();
+		setAndDrawMonsterHpBasedOnGameLevel();
 		resetInput();
 		
+		// create new pattern
 		generatePattern();
-<<<<<<< HEAD
 		
-=======
-		if (!isWinning)
-			playError();
-
-		// reset iswinning to it state
-		isWinning = false;
-
->>>>>>> 9f76ed828cff4a2af67547c079c8da2e9222909b
+		// play the new pattern
 		ActionListener togglePlayPattern = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				playInitialSound();
@@ -232,7 +214,6 @@ public class Game extends JPanel {
 				repaint();
 			}
 		};
-		
 		Timer timer = new Timer((1500), togglePlayPattern);
 		timer.setRepeats(false);
 		timer.start();
@@ -347,7 +328,7 @@ public class Game extends JPanel {
 			keys.get(input).play();
 			System.out.println("Ok");
 		} else {
-			resetPatternAndPlayPattern();
+			resetPatternAndPlayNewPattern();
 			System.out.println("WRONG!");
 		}
 
