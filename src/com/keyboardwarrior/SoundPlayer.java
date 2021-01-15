@@ -23,7 +23,7 @@ public class SoundPlayer {
 			clip.open(dais);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 	}
 
@@ -31,6 +31,9 @@ public class SoundPlayer {
 //		if (clip == null)
 //			return;
 //		stop();
+		if(clip == null)
+			return;
+		
 		clip.setFramePosition(0);
 		clip.start();
 	}

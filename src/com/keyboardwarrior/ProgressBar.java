@@ -15,7 +15,7 @@ public class ProgressBar {
 		this.width = width;
 		this.height = height;
 		baseColor = Color.GRAY;
-		foreColor = Color.BLUE;
+		foreColor = new Color(139, 0, 0);
 	}
 
 	private double getUnit() {
@@ -31,7 +31,9 @@ public class ProgressBar {
 //		System.out.println((int) getUnit()*value);
 		g.setColor(foreColor);
 		g.fillRect(this.x, this.y, (int) (getUnit() * value), height);
-
+		
+		g.setColor(Color.WHITE);
+		g.drawString(String.valueOf(value), this.x+5, this.y+16);
 	}
 
 	public int getMaxValue() {

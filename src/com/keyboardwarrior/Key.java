@@ -8,6 +8,9 @@ public class Key {
 	public static final int RELEASED = 1;
 	public static final int PRESSED = 2;
 	public static final int ERROR = 3;
+	
+	private static final int width = 50;
+	
 	private int x, y, state;
 	private String url, character;
 	private SoundPlayer sound;
@@ -29,15 +32,15 @@ public class Key {
 		} else if (this.state == ERROR) {
 			g.setColor(Color.red);
 		} else {
-			g.setColor(Color.WHITE);
+			g.setColor(new Color(58, 58, 58));
 		}
 
-		g.fillRect(this.x, this.y, 50, 50);
+		g.fillRect(this.x, this.y, width, width);
 
 		// render text
-		int stringPosX = (int) this.x + (50 / 3);
-		int stringPosY = this.y + (50 / 2);
-		g.setColor(Color.BLACK);
+		int stringPosX = (int) this.x + (width / 3);
+		int stringPosY = this.y + (width / 2);
+		g.setColor(Color.WHITE);
 		g.drawString(String.valueOf(this.character), stringPosX, stringPosY);
 	}
 

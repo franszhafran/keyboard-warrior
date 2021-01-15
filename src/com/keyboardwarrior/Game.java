@@ -58,11 +58,11 @@ public class Game extends JPanel {
 
 	private void initKeys() {
 		this.keys = new ArrayList<Key>();
-		this.keys.add(new Key(0, 0, "s"));
-		this.keys.add(new Key(60, 0, "d"));
-		this.keys.add(new Key(120, 0, "f"));
-		this.keys.add(new Key(180, 0, "j"));
-		this.keys.add(new Key(240, 0, "k"));
+		this.keys.add(new Key(110, 300, "S"));
+		this.keys.add(new Key(170, 300, "D"));
+		this.keys.add(new Key(230, 300, "F"));
+		this.keys.add(new Key(290, 300, "J"));
+		this.keys.add(new Key(350, 300, "K"));
 		for (int i = 0; i < keys.size(); i++) {
 			System.out.println(keys.get(i).getCharacter());
 		}
@@ -78,7 +78,7 @@ public class Game extends JPanel {
 
 		generatePattern();
 		monsterHp = new ProgressBar(Arena.getInstance().getMonster().getHp(), Arena.getInstance().getMonster().getHp(),
-				0, 70, 100, 20);
+				360, 100, 120, 25);
 		System.out.println("Monster HP: " + Arena.getInstance().getMonster().getHp());
 		System.out.println(pattern);
 	}
@@ -95,9 +95,8 @@ public class Game extends JPanel {
 
 		g.setColor(Color.BLACK);
 
-		g.drawString(String.valueOf(inputKey), 325, 325);
-		g.drawString("Monster HP: " + Arena.getInstance().getMonster().getHp(), 200, 200);
-		g.drawString("Level: " + gameLevel, 200, 180);
+		g.drawString("Monster HP: " + Arena.getInstance().getMonster().getHp(), 200, 380);
+		g.drawString("Level: " + gameLevel, 200, 400);
 
 		for (Key key : keys) {
 			key.render(g);
@@ -153,8 +152,6 @@ public class Game extends JPanel {
 				upGameLevel();
 			}
 		}
-
-		System.out.println(pattern);
 	}
 
 	public void setMonsterHp(int gameLevel) {
@@ -319,6 +316,8 @@ public class Game extends JPanel {
 		try {
 //			System.out.println(getKeyIndex(inputKey));
 			input = getKeyIndex(inputKey);
+			System.out.println("input");
+			System.out.println(input);
 			inputArr.add(input);
 		} catch (Exception e) {
 			return;
@@ -335,6 +334,8 @@ public class Game extends JPanel {
 		// if pattern successfully played
 		if (inputArr.size() == pattern.size()) {
 			upPatternLevel();
+			
+			// play pattern
 			ActionListener toggleOn = new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
 					playSoundAndPattern();
@@ -344,7 +345,6 @@ public class Game extends JPanel {
 			Timer timer = new Timer(1000, toggleOn);
 			timer.setRepeats(false);
 			if (monsterHp.getValue() != monsterHp.getMaxValue()) {
-				System.out.println("ini jalan");
 				timer.start();
 			}
 			resetInput();
@@ -377,18 +377,19 @@ public class Game extends JPanel {
 	 * @throws Exception
 	 */
 	private int getKeyIndex(char key) throws Exception {
-		String i = String.valueOf(key);
-		if (i.equals("s")) {
+		String i = String.valueOf(key).toUpperCase();
+		if (i.equals("S")) {
 			return 0;
-		} else if (i.equals("d")) {
+		} else if (i.equals("D")) {
 			return 1;
-		} else if (i.equals("f")) {
+		} else if (i.equals("F")) {
 			return 2;
-		} else if (i.equals("j")) {
+		} else if (i.equals("J")) {
 			return 3;
-		} else if (i.equals("k")) {
+		} else if (i.equals("K")) {
 			return 4;
 		} else {
+			System.out.println("masuk errro");
 			throw new Exception("unknown_letter");
 		}
 	}
