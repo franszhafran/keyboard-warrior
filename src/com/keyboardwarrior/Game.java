@@ -10,6 +10,7 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -30,25 +31,36 @@ public class Game extends JPanel {
 	private char inputKey;
 	private boolean isPlayingSoundAndPattern = false;
 	private boolean isWinning = false;
+	private ImageIcon monsterImg, backgroundImg;
+	private ArrayList<ImageIcon> monsterImgs;
+	private ImageIcon logo = new ImageIcon("Resource/Image/logo.png");
 
 	/**
 	 * Set up the game
 	 */
 	public Game() {
-		initKeys();
-		initArrays();
-		initGame();
+		int x = -1;
+		x = JOptionPane.showOptionDialog(null, "Are you ready?", "Keyboard Warrior", JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.QUESTION_MESSAGE, logo, new String[] { "Yes" }, "default");
+		if (x == 0) {
 
-		windowSet();
+			initKeys();
+			initArrays();
+			initGame();
 
-		KeyListener l = new GameKeyboardListener();
-		this.addKeyListener(l);
+			windowSet();
 
-		this.setFocusable(true);
+			KeyListener l = new GameKeyboardListener();
+			this.addKeyListener(l);
 
-		inputKey = 'a';
+			this.setFocusable(true);
 
-		playSoundAndPattern();
+			inputKey = 'a';
+
+			playSoundAndPattern();
+		} else {
+			System.exit(0);
+		}
 	}
 
 	private void initArrays() {
@@ -58,11 +70,11 @@ public class Game extends JPanel {
 
 	private void initKeys() {
 		this.keys = new ArrayList<Key>();
-		this.keys.add(new Key(110, 300, "S"));
-		this.keys.add(new Key(170, 300, "D"));
-		this.keys.add(new Key(230, 300, "F"));
-		this.keys.add(new Key(290, 300, "J"));
-		this.keys.add(new Key(350, 300, "K"));
+		this.keys.add(new Key(110, 410, "S"));
+		this.keys.add(new Key(170, 410, "D"));
+		this.keys.add(new Key(230, 410, "F"));
+		this.keys.add(new Key(290, 410, "J"));
+		this.keys.add(new Key(350, 410, "K"));
 		for (int i = 0; i < keys.size(); i++) {
 			System.out.println(keys.get(i).getCharacter());
 		}
@@ -78,7 +90,7 @@ public class Game extends JPanel {
 
 		generatePattern();
 		monsterHp = new ProgressBar(Arena.getInstance().getMonster().getHp(), Arena.getInstance().getMonster().getHp(),
-				360, 100, 120, 25);
+				360, 220, 120, 25);
 		System.out.println("Monster HP: " + Arena.getInstance().getMonster().getHp());
 		System.out.println(pattern);
 	}
@@ -93,33 +105,44 @@ public class Game extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		g.setColor(Color.BLACK);
+		backgroundImg = new ImageIcon("Resource/Image/bg.jpg");
+		backgroundImg.paintIcon(this, g, 0, 0);
 
-		g.drawString("Monster HP: " + Arena.getInstance().getMonster().getHp(), 200, 380);
-		g.drawString("Level: " + gameLevel, 200, 400);
+		g.setColor(Color.WHITE);
+
+		g.drawString("Monster HP: " + Arena.getInstance().getMonster().getHp(), 360, 260);
+		g.drawString("Level: " + gameLevel, 220, 480);
+
+		monsterImg = new ImageIcon("Resource/Image/level2.png");
+		monsterImgs = new ArrayList<ImageIcon>();
+		monsterImgs.add(new ImageIcon("Resource/Image/level1.png"));
+		monsterImgs.add(new ImageIcon("Resource/Image/level2.png"));
+		monsterImgs.add(new ImageIcon("Resource/Image/level3.png"));
 
 		for (Key key : keys) {
 			key.render(g);
 		}
 		monsterHp.render(g);
+
+		monsterImgs.get(gameLevel - 1).paintIcon(this, g, 100, 95);
 	}
 
 	private void setPlayerDamageBasedOnPatternLevel() {
 		Arena.getInstance().getPlayer().getDamage().setDamage(patternLevel);
 	}
-	
+
 	private void gamePlayerAttackAndDrawHp() {
 		Arena.getInstance().playerAttack();
 		drawMonsterHp();
 	}
-	
+
 	public void upPatternLevel() {
 		this.patternLevel++;
-		
+
 		setPlayerDamageBasedOnPatternLevel();
 		generatePattern();
 		gamePlayerAttackAndDrawHp();
-		
+
 		System.out.println("Monster HP: " + Arena.getInstance().getMonster().getHp());
 
 		if (Arena.getInstance().getMonster().getHp() <= 0) {
@@ -145,10 +168,10 @@ public class Game extends JPanel {
 //			timer.start();
 			int x = -1;
 			x = JOptionPane.showOptionDialog(null, "Congratulations, You Won!", "Congratulations",
-					JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
-					new String[] { "Next Level" }, "default");
-			
-			if(x == 0) {
+					JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, logo, new String[] { "Next Level" },
+					"default");
+
+			if (x == 0) {
 				upGameLevel();
 			}
 		}
@@ -172,18 +195,16 @@ public class Game extends JPanel {
 			monsterHp.setValue(Arena.getInstance().getMonster().getHp());
 		}
 	}
-	
+
 	private void setAndDrawMonsterHpBasedOnGameLevel() {
 		setAndDrawMonsterHp(gameLevel);
 	}
-	
+
 	private void setAndDrawMonsterHp(int gameLevel) {
 		setMonsterHp(gameLevel);
 		drawMonsterHp();
 	}
-	
-	
-	
+
 	public void upGameLevel() {
 		gameLevel++;
 		resetPatternAndPlayNewPattern();
@@ -194,15 +215,15 @@ public class Game extends JPanel {
 		// reset pattern
 		patternLevel = 1;
 		pattern.clear();
-		
+
 		// prepare new game with new pattern level
 		setPlayerDamageBasedOnPatternLevel();
 		setAndDrawMonsterHpBasedOnGameLevel();
 		resetInput();
-		
+
 		// create new pattern
 		generatePattern();
-		
+
 		// play the new pattern
 		ActionListener togglePlayPattern = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -215,9 +236,9 @@ public class Game extends JPanel {
 		timer.setRepeats(false);
 		timer.start();
 	}
-	
+
 	private void clearAndDrawLastInput() {
-		keys.get(pattern.get(pattern.size()- 1)).setState(Key.RELEASED);
+		keys.get(pattern.get(pattern.size() - 1)).setState(Key.RELEASED);
 		repaint();
 	}
 
@@ -325,16 +346,18 @@ public class Game extends JPanel {
 
 		if (inputArr.get(inputArr.size() - 1) == pattern.get(inputArr.size() - 1)) {
 			keys.get(input).play();
+
 			System.out.println("Ok");
 		} else {
 			resetPatternAndPlayNewPattern();
+			playError();
 			System.out.println("WRONG!");
 		}
 
 		// if pattern successfully played
 		if (inputArr.size() == pattern.size()) {
 			upPatternLevel();
-			
+
 			// play pattern
 			ActionListener toggleOn = new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
@@ -397,7 +420,7 @@ public class Game extends JPanel {
 	/**
 	 * The game's keyboard listener
 	 * 
-	 * @author frans
+	 * 
 	 *
 	 */
 	private class GameKeyboardListener implements KeyListener {
@@ -416,8 +439,8 @@ public class Game extends JPanel {
 			}
 
 			for (Key key : keys) {
-				if (key.getCharacter().equals(String.valueOf(e.getKeyChar()))) {
-					key.setState(key.PRESSED);
+				if (key.getCharacter().equals(String.valueOf(e.getKeyChar()).toUpperCase())) {
+					key.setState(Key.PRESSED);
 //					key.play();
 				}
 			}
@@ -433,9 +456,9 @@ public class Game extends JPanel {
 
 			for (Key key : keys) {
 //				if error sign is currently on
-				if (key.getState() != key.ERROR) {
-					if (key.getCharacter().equals(String.valueOf(e.getKeyChar()))) {
-						key.setState(key.RELEASED);
+				if (key.getState() != Key.ERROR) {
+					if (key.getCharacter().equals(String.valueOf(e.getKeyChar()).toUpperCase())) {
+						key.setState(Key.RELEASED);
 					}
 				}
 			}

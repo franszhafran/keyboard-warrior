@@ -8,9 +8,9 @@ public class Key {
 	public static final int RELEASED = 1;
 	public static final int PRESSED = 2;
 	public static final int ERROR = 3;
-	
+
 	private static final int width = 50;
-	
+
 	private int x, y, state;
 	private String url, character;
 	private SoundPlayer sound;
@@ -27,10 +27,12 @@ public class Key {
 	public void render(Graphics g) {
 		// render tuts sesuai dengan state
 		if (this.state == PRESSED) {
-			g.setColor(Color.BLUE);
+			// blue
+			g.setColor(new Color(1, 48, 118));
 
 		} else if (this.state == ERROR) {
-			g.setColor(Color.red);
+			// red
+			g.setColor(new Color(139, 0, 0));
 		} else {
 			g.setColor(new Color(58, 58, 58));
 		}
