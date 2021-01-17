@@ -20,8 +20,7 @@ import com.creational.ArenaFactoryConfigBuilder;
 
 public class Game extends JPanel {
 	private int patternLevel;
-	private int gameLevel = 1;
-	private Arena arena;
+	private int gameLevel;
 	private ArrayList<Integer> pattern;
 	private ArrayList<Integer> inputArr;
 	private ArrayList<Key> keys;
@@ -30,8 +29,7 @@ public class Game extends JPanel {
 	private int input;
 	private char inputKey;
 	private boolean isPlayingSoundAndPattern = false;
-	private boolean isWinning = false;
-	private ImageIcon monsterImg, backgroundImg;
+	private ImageIcon backgroundImg;
 	private ArrayList<ImageIcon> monsterImgs;
 	private ImageIcon logo = new ImageIcon("Resource/Image/logo.png");
 
@@ -43,7 +41,6 @@ public class Game extends JPanel {
 		x = JOptionPane.showOptionDialog(null, "Are you ready?", "Keyboard Warrior", JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.QUESTION_MESSAGE, logo, new String[] { "Yes" }, "default");
 		if (x == 0) {
-
 			initKeys();
 			initArrays();
 			initGame();
@@ -66,18 +63,16 @@ public class Game extends JPanel {
 	private void initArrays() {
 		pattern = new ArrayList<Integer>();
 		inputArr = new ArrayList<Integer>();
+		monsterImgs = new ArrayList<ImageIcon>();
+		keys = new ArrayList<Key>();
 	}
 
 	private void initKeys() {
-		this.keys = new ArrayList<Key>();
 		this.keys.add(new Key(110, 410, "S"));
 		this.keys.add(new Key(170, 410, "D"));
 		this.keys.add(new Key(230, 410, "F"));
 		this.keys.add(new Key(290, 410, "J"));
 		this.keys.add(new Key(350, 410, "K"));
-		for (int i = 0; i < keys.size(); i++) {
-			System.out.println(keys.get(i).getCharacter());
-		}
 	}
 
 	private void initGame() {
@@ -87,12 +82,11 @@ public class Game extends JPanel {
 
 		ArenaFactory.createFromConfig(arenaConfig.build());
 		patternLevel = 1;
+		gameLevel = 1;
 
 		generatePattern();
 		monsterHp = new ProgressBar(Arena.getInstance().getMonster().getHp(), Arena.getInstance().getMonster().getHp(),
 				360, 220, 120, 25);
-		System.out.println("Monster HP: " + Arena.getInstance().getMonster().getHp());
-		System.out.println(pattern);
 	}
 
 	private void windowSet() {
@@ -113,8 +107,6 @@ public class Game extends JPanel {
 		g.drawString("Monster HP: " + Arena.getInstance().getMonster().getHp(), 360, 260);
 		g.drawString("Level: " + gameLevel, 220, 480);
 
-		monsterImg = new ImageIcon("Resource/Image/level2.png");
-		monsterImgs = new ArrayList<ImageIcon>();
 		monsterImgs.add(new ImageIcon("Resource/Image/level1.png"));
 		monsterImgs.add(new ImageIcon("Resource/Image/level2.png"));
 		monsterImgs.add(new ImageIcon("Resource/Image/level3.png"));
@@ -143,29 +135,7 @@ public class Game extends JPanel {
 		generatePattern();
 		gamePlayerAttackAndDrawHp();
 
-		System.out.println("Monster HP: " + Arena.getInstance().getMonster().getHp());
-
 		if (Arena.getInstance().getMonster().getHp() <= 0) {
-//			ActionListener toggleDialog = new ActionListener() {
-//				public void actionPerformed(ActionEvent evt) {
-//					int x = 5;
-//					x = JOptionPane.showOptionDialog(null, "Congratulations, You Won!", "Congratulations",
-//							JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
-//							new String[] { "Next Level" }, "default");
-//					System.out.println("dialog callback");
-//					System.out.println(x);
-//					if(x == 0) {
-//						System.out.println("X is");
-//						System.out.println(x);
-//						gameLevel++;
-//						isWinning = true;
-//						reset();
-//					}
-//				}
-//			};
-//			Timer timer = new Timer(1000, toggleDialog);
-//			timer.setRepeats(false);
-//			timer.start();
 			int x = -1;
 			x = JOptionPane.showOptionDialog(null, "Congratulations, You Won!", "Congratulations",
 					JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, logo, new String[] { "Next Level" },
@@ -227,7 +197,7 @@ public class Game extends JPanel {
 		// play the new pattern
 		ActionListener togglePlayPattern = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				playInitialSound();
+				blinkAllKeys();
 				playSoundAndPattern();
 				repaint();
 			}
@@ -235,11 +205,6 @@ public class Game extends JPanel {
 		Timer timer = new Timer((1500), togglePlayPattern);
 		timer.setRepeats(false);
 		timer.start();
-	}
-
-	private void clearAndDrawLastInput() {
-		keys.get(pattern.get(pattern.size() - 1)).setState(Key.RELEASED);
-		repaint();
 	}
 
 	public void resetInput() {
@@ -268,8 +233,7 @@ public class Game extends JPanel {
 
 	}
 
-	public void playInitialSound() {
-
+	public void blinkAllKeys() {
 		for (final Key key : keys) {
 			key.setState(Key.PRESSED);
 
@@ -285,9 +249,11 @@ public class Game extends JPanel {
 			timer.setRepeats(false);
 			timer.start();
 		}
-
 	}
 
+	/**
+	 * Blink the key and play the sound for each pattern
+	 */
 	public void playSoundAndPattern() {
 		isPlayingSoundAndPattern = true;
 		int time = 500 - pattern.size() * 20;
@@ -302,7 +268,6 @@ public class Game extends JPanel {
 				}
 			};
 			Timer timer = new Timer(time * (2 * i + 1), toggleOn);
-//			System.out.println(time * (2 * i + 1));
 			timer.setRepeats(false);
 			timer.start();
 
@@ -313,8 +278,6 @@ public class Game extends JPanel {
 				}
 			};
 			Timer timer2 = new Timer(time * (2 * i + 2), toggleOff);
-//			System.out.println(time * (2 * i + 2));
-//			System.out.println();
 			timer2.setRepeats(false);
 			timer2.start();
 		}
@@ -325,7 +288,6 @@ public class Game extends JPanel {
 			}
 		};
 		Timer timer2 = new Timer(time * ((pattern.size() + 1) * 2 - 1), toggleOff);
-//		System.out.println(time * ((pattern.size()) * 2 - 1));
 		timer2.setRepeats(false);
 		timer2.start();
 	}
@@ -335,10 +297,7 @@ public class Game extends JPanel {
 	 */
 	public void readAndCheckInput() {
 		try {
-//			System.out.println(getKeyIndex(inputKey));
 			input = getKeyIndex(inputKey);
-			System.out.println("input");
-			System.out.println(input);
 			inputArr.add(input);
 		} catch (Exception e) {
 			return;
@@ -346,12 +305,9 @@ public class Game extends JPanel {
 
 		if (inputArr.get(inputArr.size() - 1) == pattern.get(inputArr.size() - 1)) {
 			keys.get(input).play();
-
-			System.out.println("Ok");
 		} else {
 			resetPatternAndPlayNewPattern();
 			playError();
-			System.out.println("WRONG!");
 		}
 
 		// if pattern successfully played
@@ -412,16 +368,12 @@ public class Game extends JPanel {
 		} else if (i.equals("K")) {
 			return 4;
 		} else {
-			System.out.println("masuk errro");
 			throw new Exception("unknown_letter");
 		}
 	}
 
 	/**
 	 * The game's keyboard listener
-	 * 
-	 * 
-	 *
 	 */
 	private class GameKeyboardListener implements KeyListener {
 		@Override
