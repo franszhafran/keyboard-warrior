@@ -2,13 +2,13 @@ package com.creational;
 
 import com.keyboardwarrior.*;
 
-public class ArenaFactory {
-	public static Arena createFromConfig(ArenaFactoryConfig config) {
+public class ArenaFactory {	
+	public static Arena create(int playerDamage, int monsterHp) {
 		Player player = new Player();
-		player.setDamage(new Damage(config.getPlayerDamage()));
+		player.setDamage(new Damage(playerDamage));
 		
 		Monster monster = new Monster();
-		monster.setHp(config.getMonsterHP());
+		monster.setHp(monsterHp);
 		
 		Arena arena = Arena.getInstance();
 		arena.setMonster(monster);

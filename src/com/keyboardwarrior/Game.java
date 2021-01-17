@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import com.creational.ArenaFactory;
-import com.creational.ArenaFactoryConfigBuilder;
 
 public class Game extends JPanel {
 	private int patternLevel;
@@ -76,17 +75,13 @@ public class Game extends JPanel {
 	}
 
 	private void initGame() {
-		ArenaFactoryConfigBuilder arenaConfig = new ArenaFactoryConfigBuilder();
-		arenaConfig.setMonsterHP(15);
-		arenaConfig.setPlayerDamage(1);
-
-		ArenaFactory.createFromConfig(arenaConfig.build());
+		ArenaFactory.create(1, 15);
+		
 		patternLevel = 1;
 		gameLevel = 1;
 
 		generatePattern();
-		monsterHp = new ProgressBar(Arena.getInstance().getMonster().getHp(), Arena.getInstance().getMonster().getHp(),
-				360, 220, 120, 25);
+		monsterHp = new ProgressBar(Arena.getInstance().getMonster().getHp(), Arena.getInstance().getMonster().getHp(), 360, 220, 120, 25);
 	}
 
 	private void windowSet() {
