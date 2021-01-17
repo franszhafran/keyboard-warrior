@@ -76,12 +76,13 @@ public class Game extends JPanel {
 
 	private void initGame() {
 		ArenaFactory.create(1, 15);
-		
+
 		patternLevel = 1;
 		gameLevel = 1;
 
 		generatePattern();
-		monsterHp = new ProgressBar(Arena.getInstance().getMonster().getHp(), Arena.getInstance().getMonster().getHp(), 360, 220, 120, 25);
+		monsterHp = new ProgressBar(Arena.getInstance().getMonster().getHp(), Arena.getInstance().getMonster().getHp(),
+				360, 220, 120, 25);
 	}
 
 	private void windowSet() {
@@ -173,7 +174,7 @@ public class Game extends JPanel {
 	public void upGameLevel() {
 		gameLevel++;
 		resetPatternAndPlayNewPattern();
-		playError();
+		blinkAndPlaySound("success");
 	}
 
 	public void resetPatternAndPlayNewPattern() {
@@ -206,12 +207,15 @@ public class Game extends JPanel {
 		inputArr.clear();
 	}
 
-	public void playError() {
-		error = new SoundPlayer("/Sound/error.wav");
+	public void blinkAndPlaySound(String type) {
+		error = new SoundPlayer("/Sound/" + type + ".wav");
 		error.play();
 
 		for (final Key key : keys) {
+
 			key.setState(Key.ERROR);
+			if (type == "success")
+				key.setState(Key.SUCCESS);
 
 			ActionListener toggleOff = new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
@@ -302,7 +306,7 @@ public class Game extends JPanel {
 			keys.get(input).play();
 		} else {
 			resetPatternAndPlayNewPattern();
-			playError();
+			blinkAndPlaySound("error");
 		}
 
 		// if pattern successfully played

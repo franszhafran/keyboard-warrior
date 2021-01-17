@@ -8,6 +8,7 @@ public class Key {
 	public static final int RELEASED = 1;
 	public static final int PRESSED = 2;
 	public static final int ERROR = 3;
+	public static final int SUCCESS = 4;
 
 	private static final int width = 50;
 
@@ -33,6 +34,10 @@ public class Key {
 		} else if (this.state == ERROR) {
 			// red
 			g.setColor(new Color(139, 0, 0));
+		} else if (this.state == SUCCESS) {
+			// red
+			g.setColor(new Color(45, 107, 79));
+
 		} else {
 			g.setColor(new Color(58, 58, 58));
 		}
