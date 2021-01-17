@@ -40,8 +40,8 @@ public class Game extends JPanel {
 		x = JOptionPane.showOptionDialog(null, "Are you ready?", "Keyboard Warrior", JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.QUESTION_MESSAGE, logo, new String[] { "Yes" }, "default");
 		if (x == 0) {
-			initKeys();
 			initArrays();
+			initKeys();
 			initGame();
 
 			windowSet();
@@ -67,11 +67,11 @@ public class Game extends JPanel {
 	}
 
 	private void initKeys() {
-		this.keys.add(new Key(110, 410, "S"));
-		this.keys.add(new Key(170, 410, "D"));
-		this.keys.add(new Key(230, 410, "F"));
-		this.keys.add(new Key(290, 410, "J"));
-		this.keys.add(new Key(350, 410, "K"));
+		keys.add(new Key(110, 410, "S"));
+		keys.add(new Key(170, 410, "D"));
+		keys.add(new Key(230, 410, "F"));
+		keys.add(new Key(290, 410, "J"));
+		keys.add(new Key(350, 410, "K"));
 	}
 
 	private void initGame() {
